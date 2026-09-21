@@ -40,7 +40,9 @@ Before starting, ask the user:
 
 | Convention | Why |
 |---|---|
-| Give every identifier — `FR-001`, `UC-001`, `NFR-001`, `T-001`, `TC-U-001` — a heading anchor | Makes `design.md#fr-003` a working cross-artifact link. Later phases cite earlier requirements by anchor instead of restating them. |
+| Give every identifier — `FR-001`, `UC-001`, `NFR-001`, `T-001`, `TC-U-001` — its own heading whose text is **exactly the identifier** (`#### FR-001`), and put the title and statement in the body below it | Markdown renderers derive the anchor from the heading text, so a bare-identifier heading yields exactly `#fr-001` — which is what makes `design.md#fr-001` a working cross-artifact link. Later phases cite earlier requirements by anchor instead of restating them. A heading that also carries a title (`#### FR-001 — Open a file`) slugs to `#fr-001--open-a-file` and silently breaks every citation pointing at it. |
+| **Never** hand-write an inline HTML anchor — `<a id="fr-001"></a>` | The artifacts are Markdown. Raw HTML shows up as visible noise in plain-text and terminal viewers, and it duplicates an anchor the heading already provides. A heading is the only anchor mechanism these artifacts use. |
+| Actors are the one exception to bare-identifier headings: use `#### Actor: [Name]` | Actors have no numeric id, so the name *is* the identifier. `Actor: API Developer` slugs to `#actor-api-developer`, which stays stable and readable. |
 | Use consistent heading levels | `#` for title, `##` for major sections, `###` for subsections |
 | Acceptance criteria use task list syntax `- [ ]` | Clear, readable, and can be checked off manually |
 | Mermaid diagrams use fenced code blocks with `mermaid` language | Renders in most Markdown viewers (GitHub, VS Code, etc.) |
@@ -77,19 +79,27 @@ date: YYYY-MM-DD
 
 ## Actors
 
-- **[Actor]** — [role description]
+#### Actor: [Name]
+
+[role description]
 
 ## Use Cases
 
-- **UC-001** — **[title]** — [description]
+#### UC-001
+
+**[title]** — [description]
 
 ## Functional Requirements
 
-- **FR-001** — The system SHALL [behaviour] when [condition]
+#### FR-001
+
+The system SHALL [behaviour] when [condition]
 
 ## Non-Functional Requirements
 
-- **NFR-001** — **[type]** — [requirement with a measurable threshold]
+#### NFR-001
+
+**[type]** — [requirement with a measurable threshold]
 
 ## Constraints
 
@@ -343,8 +353,9 @@ The Orchestrator **edits this file in place**, flipping `status:` as tasks move
 `backlog → doing → test → review → done` and adding `blocked_reason:` when a task stalls.
 
 Each task's fields are stored in a YAML-style code block in the same line-oriented format
-the Orchestrator already edits — one field per line, `- key: value`. The heading above it carries
-the task id as an anchor so other artifacts can link to it.
+the Orchestrator already edits — one field per line, `- key: value`. The heading above it is the
+task id and **nothing else** (`### T-001`), so it anchors to `#t-001` and the Summary's critical
+path can link to it. The human-readable title lives in the block's `title:` field, not the heading.
 
 **Output contract**:
 
@@ -487,7 +498,10 @@ unit:
   thresholds belong to an `ai-engineer` task, while `software-tester-design` / `-automation` keep
   everything deterministic around it. Never write a non-deterministic model output as the `then:` of
   a `TC-U-xxx` — pin the schema, the guardrail, and the fallback instead, and leave quality to the eval
-- Every artifact must be well-formed Markdown — valid syntax, no duplicate anchor `id`s, and no internal links pointing at an anchor that does not exist
+- Every artifact must be well-formed Markdown — valid syntax, no raw HTML (anchors come from
+  headings, never `<a id="…"></a>`), no duplicate anchor ids, and no internal links pointing at an
+  anchor that does not exist. Check this before each phase gate: every `](file.md#anchor)` and
+  `](#anchor)` must match a heading that actually exists in the target file.
 
 ## Reference Files
 
