@@ -1,0 +1,16 @@
+{
+  "info": {
+    "_postman_id": "ffffffff-eeee-4ddd-8ccc-bbbbbbbbbbbb",
+    "name": "v2.0 with a structurally invalid item tree",
+    "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+  },
+  "item": [
+    42,
+    null,
+    "not an item at all",
+    { "name": "neither a folder nor a request" },
+    { "name": "both a folder and a request", "item": [], "request": { "method": "GET" } },
+    { "name": "request is a number", "request": 7 },
+    { "name": "item is not an array", "item": { "nope": true } }
+  ]
+}

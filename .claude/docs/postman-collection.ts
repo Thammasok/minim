@@ -80,7 +80,8 @@ export interface ItemRequest {
   id?: string;
   name?: string;
   description?: Description | string;
-  request: Request;
+  /** request เป็นได้ทั้ง object และ string (URL เปล่าๆ) — พบใน export จริงจาก Postman */
+  request: Request | string;
   /** saved examples / responses ที่บันทึกไว้ */
   response?: Response[];
   event?: Event[];

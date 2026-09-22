@@ -283,6 +283,19 @@ All commands are `async`, return `Result<T, AppError>`, and are registered throu
 Tagged and structured rather than a flat string, so [FR-005](requirements.md#fr-005)–[FR-007](requirements.md#fr-007)
 can each render a distinct, specific message without the frontend parsing prose.
 
+**Amended 2026-09-21 (owner decision, raised as G-1 by T-020).** The variant set above omitted any
+`tauri-plugin-store` failure, leaving [T-010](dev-plan.md#t-010) with no typed error to return when
+recents or preferences cannot be read or written. A tenth variant is therefore added:
+
+```json
+{ "kind": "storeUnavailable",
+  "detail": { "operation": "read" | "write", "reason": "…" } }
+```
+
+It is non-fatal — the collection still opens; only persistence is degraded — but it is surfaced,
+because a user whose preferences silently stop persisting is owed an explanation. The rule that
+every distinct failure the UI must distinguish gets its own variant is preserved.
+
 ## Key Decisions
 
 | Decision | Options Considered | Chosen | Rationale |
@@ -303,6 +316,7 @@ can each render a distinct, specific message without the frontend parsing prose.
 | **ADR-014** — Tree rendering | Plain recursive render · TanStack Virtual | **TanStack Virtual over a flattened visible-node list** | 2,000 nodes with expand/collapse is past the point where full render meets [NFR-002](requirements.md#nfr-002). Flattening the visible set also makes ARIA tree semantics and keyboard navigation ([NFR-011](requirements.md#nfr-011)) straightforward. |
 | **ADR-015** — Input guards | No limit · size cap | **64 MB cap, `FileTooLarge`** | Bounds worst-case memory ([NFR-004](requirements.md#nfr-004)) and closes the trivial DoS of pointing the viewer at a multi-GB file. Well above any real collection. |
 | **ADR-016** — Credential handling | Omit sensitive values from the DTO · send with a `sensitive` flag | **Send with the flag; frontend masks behind a reveal** | The user opened this local file and can read it in any editor; hiding it from them is theatre. The flag drives [FR-032](requirements.md#fr-032) so tokens don't land in a screen-share by accident. |
+| **ADR-017** — Testing the native file dialog | Manual check only · debug-only `--open <path>` argument · mock the dialog plugin | **Debug-only `--open <path>` argument** | WebDriver cannot script a native OS file dialog, so the dialog half of [FR-001](requirements.md#fr-001) is not automatable. A CLI argument compiled in under `debug_assertions` only — so it cannot reach a release bundle — lets E2E drive the whole open flow end to end. Mocking the plugin was rejected: it would stop exercising the real plugin wiring, which is the part most likely to break. The dialog *invocation* itself still needs one manual check per release. Added 2026-09-21 (owner decision, raised as G-2 by T-020). |
 
 ## Frontend Structure
 
@@ -389,6 +403,16 @@ Intentionally minimal — this file *is* the enforcement of [NFR-007](requiremen
   ]
 }
 ```
+
+**Amended 2026-09-21 (owner decision, raised by T-002).** `tauri.conf.json` also carries a
+**`devCsp`** alongside `csp`. The production `csp` above is unchanged. The strict policy blocks
+Vite's HMR websocket, so live reload dies silently in development; `devCsp` is the identical
+policy with `connect-src` widened to `http://localhost:1420 ws://localhost:1420` and nothing else.
+Tauri applies it only under `is_dev()` — it can never reach a release bundle. The no-remote-origin
+rule still binds it, and `tc_u_004_dev_csp_widens_only_to_localhost` enforces that, checking
+`ws://` and `wss://` as well as `http(s)://`. Recorded here because this file is the reference for
+[NFR-007](requirements.md#nfr-007) and [NFR-008](requirements.md#nfr-008) and must not understate
+the security surface.
 
 No `fs:` permission, no `http:` permission, no `shell:` permission. File reading happens in
 `open_collection` on a path the user chose.

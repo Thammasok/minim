@@ -1,0 +1,61 @@
+{
+  "info": {
+    "_postman_id": "0f0f0f0f-0000-4000-8000-00000000warn",
+    "name": "Load Warnings",
+    "description": "Deliberately schema-INVALID in five specific ways, one per LoadWarning variant in design.md. This file MUST still open (FR-008, FR-009) and MUST produce exactly the five warnings below. It is excluded from the published-schema check on purpose — see tests/fixtures/README.md.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "dup", "value": "first", "type": "string" },
+    { "key": "dup", "value": "second", "type": "string" },
+    { "key": "odd_type", "value": "x", "type": "default" }
+  ],
+  "item": [
+    {
+      "name": "UnknownAuthType",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "https://api.warn.test/v1/auth",
+        "auth": {
+          "type": "jwtBearer",
+          "jwtBearer": [
+            { "key": "algorithm", "value": "HS256", "type": "string" },
+            { "key": "secret", "value": "{{jwt_secret}}", "type": "string" }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "UnknownBodyMode",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "https://api.warn.test/v1/body",
+        "body": {
+          "mode": "binaryStream",
+          "binaryStream": { "src": "/tmp/whatever.bin" }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "MalformedRawHeaderLine",
+      "request": {
+        "method": "GET",
+        "header": "Accept: application/json\nThisLineHasNoColon\n\n   \nX-Ok: 1",
+        "url": "https://api.warn.test/v1/headers"
+      },
+      "response": []
+    },
+    {
+      "name": "ItemNeitherGroupNorRequest - the next three siblings",
+      "request": { "method": "GET", "header": [], "url": "https://api.warn.test/v1/ok" },
+      "response": []
+    },
+    { "name": "no request, no item" },
+    { "name": "request is a number", "request": 7 },
+    { "name": "item is an object, not an array", "item": { "nope": true } }
+  ]
+}

@@ -61,7 +61,7 @@ are never touched by the same task.
   commands in CLAUDE.md, which currently states that none exist.
 - agent: react-vite-developer
 - depends_on: []
-- status: backlog
+- status: done
 - size: M
 ```
 
@@ -115,7 +115,7 @@ reason.
   cargo fmt --check, cargo clippy -D warnings, cargo test, and the frontend checks.
 - agent: rust-backend-engineer
 - depends_on: [T-001]
-- status: backlog
+- status: done
 - size: M
 ```
 
@@ -173,7 +173,7 @@ than ship. Keep them as plain Rust tests reading the JSON.
   2000-leaf / ~5 MB collection for the performance work rather than committing the large file.
 - agent: rust-backend-engineer
 - depends_on: []
-- status: backlog
+- status: done
 - size: M
 ```
 
@@ -181,7 +181,7 @@ than ship. Keep them as plain Rust tests reading the JSON.
 
 - [ ] `tests/fixtures/real/` holds ≥ 3 collections, with a README naming each source version, or documenting that stand-ins were used and why
 - [ ] `tests/fixtures/torture.json` exercises every polymorphic shape in [FR-010](requirements.md#fr-010)–[FR-013](requirements.md#fr-013), all 5 body modes, and every auth type in the schema
-- [ ] `tests/fixtures/reject/` holds one file per [AppError](design.md#apperror-wire-shape) rejection variant
+- [x] `tests/fixtures/reject/` holds one file per [AppError](design.md#apperror-wire-shape) rejection variant. **Amended 2026-09-21:** a zero-`item` collection belongs in `edge/`, not `reject/` — [FR-022](requirements.md#fr-022) requires it to *load* with an empty state. The rejection case is a collection with no `item` key at all (`reject/missing-item.json`).
 - [ ] A generator produces a deterministic 2,000-leaf collection; the large file is gitignored
 - [ ] Every fixture that claims to be v2.1 validates against the published v2.1 JSON schema
 
@@ -235,7 +235,7 @@ This task is deliberately dependency-free so it can start immediately, in parall
   structurally discriminated union — a folder has item[], a leaf has request.
 - agent: rust-backend-engineer
 - depends_on: [T-002, T-003]
-- status: backlog
+- status: done
 - size: L
 ```
 
@@ -313,7 +313,7 @@ updating too.
   stringly-typed error breaks that screen.
 - agent: rust-backend-engineer
 - depends_on: [T-004]
-- status: backlog
+- status: done
 - size: S
 ```
 
@@ -324,6 +324,7 @@ updating too.
 - [ ] Invalid JSON yields `NotJson` carrying line and column ([FR-007](requirements.md#fr-007))
 - [ ] Valid JSON missing `info` or `item` yields `NotACollection` naming the missing field ([FR-006](requirements.md#fr-006))
 - [ ] Every `AppError` variant serializes to the `{kind, detail}` shape
+- [ ] `StoreUnavailable { operation, reason }` is present in the enum ([design.md §AppError wire shape](design.md#apperror-wire-shape), amended 2026-09-21) — it is non-fatal and reported by T-010, but the variant is defined here
 
 #### Test cases (TDD contract)
 
@@ -390,7 +391,7 @@ satisfy the requirement; the fixture is built to fail loudly if that happens.
   field directly.
 - agent: rust-backend-engineer
 - depends_on: [T-004]
-- status: backlog
+- status: done
 - size: M
 ```
 
@@ -484,7 +485,7 @@ colon instead of the first is the classic bug in this code, and it silently corr
   that S4 displays.
 - agent: rust-backend-engineer
 - depends_on: [T-004, T-006]
-- status: backlog
+- status: done
 - size: L
 ```
 
@@ -578,7 +579,7 @@ unit:
   debug_assertions, and commit the generated file so CI diffs catch drift (NFR-015).
 - agent: rust-backend-engineer
 - depends_on: [T-005, T-006, T-007]
-- status: backlog
+- status: done
 - size: M
 ```
 
@@ -655,7 +656,7 @@ opens, the section renders raw, and the user is told which node was odd.
   get_node_detail must be an O(1) arena lookup with no re-parse and no file access.
 - agent: rust-backend-engineer
 - depends_on: [T-008]
-- status: backlog
+- status: done
 - size: M
 ```
 
@@ -667,6 +668,7 @@ opens, the section renders raw, and the user is told which node was odd.
 - [ ] `open_collection` on a second file fully replaces the first ([requirements.md Out of Scope](requirements.md#out-of-scope) — one at a time)
 - [ ] `get_node_detail` with no collection open returns `NoCollectionOpen`, not a panic
 - [ ] `reload_collection` re-reads from disk and preserves `NodeId`s for an unchanged file ([FR-045](requirements.md#fr-045))
+- [ ] A debug-only `--open <path>` CLI argument opens a collection without the native dialog, compiled in under `debug_assertions` only so it cannot reach a release bundle ([ADR-017](design.md#key-decisions)) — this is what makes the open flow E2E-testable in T-021
 
 #### Test cases (TDD contract)
 
@@ -738,7 +740,7 @@ unit:
   and removable rather than silently retried (FR-042).
 - agent: rust-backend-engineer
 - depends_on: [T-002, T-008]
-- status: backlog
+- status: done
 - size: S
 ```
 
@@ -749,6 +751,7 @@ unit:
 - [ ] `forget_recent` removes exactly one entry
 - [ ] Theme preference persists across restart ([FR-043](requirements.md#fr-043))
 - [ ] Nothing minim-specific is ever written into the collection file ([FR-017](requirements.md#fr-017))
+- [ ] A store read/write failure returns `StoreUnavailable` rather than panicking or being swallowed; the collection still opens with empty recents and the default theme ([design.md §AppError wire shape](design.md#apperror-wire-shape), amended 2026-09-21)
 
 #### Test cases (TDD contract)
 
@@ -804,17 +807,17 @@ unit:
   runs, it is done when the corpus is clean.
 - agent: rust-backend-engineer
 - depends_on: [T-009]
-- status: backlog
+- status: done
 - size: M
 ```
 
 #### Acceptance criteria
 
-- [ ] A fuzz/property harness covers the whole load path, not just `serde_json`
-- [ ] ≥ 1,000 mutants produce zero panics and zero hangs ([NFR-005](requirements.md#nfr-005))
-- [ ] Every mutant yields `Ok(model)` or a typed `AppError` — no `unwrap`/`expect`/`panic!` remains reachable in the path
-- [ ] A per-input time bound is enforced so a pathological file cannot hang the app ([FR-008](requirements.md#fr-008))
-- [ ] The corpus and any crash artifacts are committed for regression
+- [x] A fuzz/property harness covers the whole load path, not just `serde_json`
+- [x] ≥ 1,000 mutants produce zero panics and zero hangs ([NFR-005](requirements.md#nfr-005))
+- [x] Every mutant yields `Ok(model)` or a typed `AppError` — no `unwrap`/`expect`/`panic!` remains reachable in the path
+- [x] A per-input time bound is enforced so a pathological file cannot hang the app ([FR-008](requirements.md#fr-008))
+- [x] The corpus and any crash artifacts are committed for regression
 
 #### Test cases (TDD contract)
 
@@ -864,13 +867,13 @@ unverifiable by example-based tests alone. This task is what makes that requirem
 ```yaml
 - title: Add the performance benchmark harness
 - description: >
-  Add Criterion benchmarks over the generated 2000-leaf / ~5 MB fixture from T-003, measuring
-  parse-to-indexed-model and the get_node_detail lookup. Record a resident-memory measurement with
-  the collection loaded. These are the machine-checkable halves of NFR-001, NFR-002 and NFR-004;
-  the render-side halves belong to the frontend tasks.
+  Add Criterion benchmarks over the generated 2000-leaf / ~5 MB fixture (T-003), measuring parse to
+  indexed model and the get_node_detail lookup, plus a resident-memory measurement with the
+  collection loaded. These are the machine-checkable halves of NFR-001, NFR-002 and NFR-004; the
+  render-side halves belong to the frontend tasks.
 - agent: rust-backend-engineer
 - depends_on: [T-009]
-- status: backlog
+- status: done
 - size: S
 ```
 
@@ -931,7 +934,7 @@ both halves together rather than silently moving the total.
   token-var groups. Bundle Inter and JetBrains Mono locally; the CSP forbids remote font origins.
 - agent: react-vite-developer
 - depends_on: [T-001]
-- status: backlog
+- status: done
 - size: M
 ```
 
@@ -1000,7 +1003,7 @@ becomes true or gets corrected.
   is reachable by keyboard, not hover-only.
 - agent: react-vite-developer
 - depends_on: [T-010, T-013]
-- status: backlog
+- status: review
 - size: S
 ```
 
@@ -1051,6 +1054,16 @@ unit:
       expected: forget button is visible and in the tab order
 ```
 
+**Orchestrator note (integration, 2026-09-21)** — the drop test cases below (TC-U-058, TC-U-059)
+are written against DOM `drop` events, but `tauri.conf.json` sets `dragDropEnabled: true`, so the
+webview intercepts the OS drop and DOM events never fire in the desktop shell. Turning the flag
+off is not the fix: Tauri v2 `File` objects carry no filesystem path, and [ADR-008](design.md#key-decisions)
+has the Rust core read the file. The runtime path is `getCurrentWebview().onDragDropEvent()`,
+whose payload carries `paths: string[]`; it is implemented in `src/features/session/use-tauri-file-drop.ts`
+and shares `classifyPaths` with the DOM path, so both accept and refuse identically. **T-021 must
+cover the drop through the Tauri event, not through a synthetic DOM event** — a DOM-only E2E test
+would pass against inert code.
+
 **Notes** — TC-U-061 guards a specific accessibility regression: `opacity-0 group-hover:opacity-100`
 without the `focus-visible:` counterpart hides the control from keyboard users entirely.
 
@@ -1068,7 +1081,7 @@ without the `focus-visible:` counterpart hides the control from keyboard users e
   restores the pre-filter expansion state when cleared.
 - agent: react-vite-developer
 - depends_on: [T-009, T-013]
-- status: backlog
+- status: review
 - size: L
 ```
 
@@ -1155,7 +1168,7 @@ computed from the full list.
   {{variable}} token chip here; body/auth/scripts renderers are T-017.
 - agent: react-vite-developer
 - depends_on: [T-009, T-013]
-- status: backlog
+- status: done
 - size: L
 ```
 
@@ -1235,7 +1248,7 @@ slice has: collection files come from strangers.
   changes. Scripts render read-only with the permanent notice that minim never runs them.
 - agent: react-vite-developer
 - depends_on: [T-016]
-- status: backlog
+- status: review
 - size: L
 ```
 
@@ -1321,7 +1334,7 @@ rendered.
   and collection scripts. The folder view shows folder scripts, auth and variables.
 - agent: react-vite-developer
 - depends_on: [T-016]
-- status: backlog
+- status: review
 - size: M
 ```
 
@@ -1392,7 +1405,7 @@ drop TC-U-081 and that acceptance criterion; nothing else in the plan depends on
   status bar.
 - agent: react-vite-developer
 - depends_on: [T-009, T-013]
-- status: backlog
+- status: review
 - size: M
 ```
 
@@ -1405,6 +1418,7 @@ drop TC-U-081 and that acceptance criterion; nothing else in the plan depends on
 - [ ] Skeleton appears immediately; Cancel only after 400 ms
 - [ ] The empty state names the collection ([FR-022](requirements.md#fr-022))
 - [ ] Warnings list node path and reason; dismissing keeps the status-bar count ([FR-009](requirements.md#fr-009))
+- [ ] `StoreUnavailable` renders as a dismissible non-fatal notice, not a blocking dialog — the collection is open and usable; only persistence is degraded ([ADR-013](design.md#key-decisions))
 - [ ] The error dialog carries `role="alert"`, traps focus, and restores focus on close
 
 #### Test cases (TDD contract)
@@ -1479,7 +1493,7 @@ acceptance criterion enforceable at compile time rather than by review.
   command-contract tests. Output must be in TC-xxx format for software-tester-automation.
 - agent: software-tester-design
 - depends_on: []
-- status: backlog
+- status: done
 - size: M
 ```
 
@@ -1522,6 +1536,7 @@ command surface rather than inventing endpoints.
 - [ ] Rust parse/normalize coverage ≥ 90%; frontend state and normalizer-consuming components ≥ 80% ([NFR-016](requirements.md#nfr-016))
 - [ ] E2E runs on `tauri-driver` + WebdriverIO, not Playwright ([ADR-012](design.md#key-decisions))
 - [ ] E2E covers open → tree → select → detail, plus every rejection path and recents across restart
+- [ ] E2E drives the open flow via the debug-only `--open <path>` argument ([ADR-017](design.md#key-decisions)); the native dialog invocation itself is recorded as a manual per-release check, not silently dropped
 - [ ] The fidelity suite opens every fixture in `tests/fixtures/real/` with no field silently lost ([NFR-006](requirements.md#nfr-006))
 - [ ] Test report produced with pass/fail per TC-id
 

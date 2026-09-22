@@ -1,0 +1,25 @@
+{
+  "id": "0ab1c2d3-4e5f-6a7b-8c9d-0e1f2a3b4c5d",
+  "name": "Acme Billing (v1)",
+  "description": "Postman Collection Format v1. Note: v1 has no info block and no schema field at all.",
+  "order": [
+    "11111111-1111-1111-1111-111111111111"
+  ],
+  "folders": [],
+  "timestamp": 1421827085000,
+  "owner": "12345",
+  "public": false,
+  "requests": [
+    {
+      "id": "11111111-1111-1111-1111-111111111111",
+      "headers": "Content-Type: application/json\n",
+      "url": "https://api.acme.test/v1/auth/login",
+      "method": "POST",
+      "data": "{}",
+      "dataMode": "raw",
+      "name": "Login",
+      "description": "",
+      "collectionId": "0ab1c2d3-4e5f-6a7b-8c9d-0e1f2a3b4c5d"
+    }
+  ]
+}

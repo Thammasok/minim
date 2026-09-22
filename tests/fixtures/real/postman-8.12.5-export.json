@@ -1,0 +1,115 @@
+{
+	"info": {
+		"_postman_id": "3f1d9c2a-4b77-4e0e-9a61-1c5c0b6d7e10",
+		"name": "Acme Billing (v8 style)",
+		"description": "Internal billing API. Exported from Postman 8.12.5 — description is a plain string at this vintage.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}"
+						},
+						"url": "https://api.acme.test/v1/auth/login",
+						"description": "Exchange credentials for a bearer token."
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.environment.set(\"token\", pm.response.json().token);"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Refresh",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": "https://api.acme.test/v1/auth/refresh"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Invoices",
+			"item": [
+				{
+					"name": "List invoices",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": "https://api.acme.test/v1/invoices?page=1&per_page=25"
+					},
+					"response": []
+				},
+				{
+					"name": "Get invoice",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": "https://api.acme.test/v1/invoices/{{invoice_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Void invoice",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": "https://api.acme.test/v1/invoices/{{invoice_id}}"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"id": "0d1a2b3c-0000-4000-8000-000000000001",
+			"key": "invoice_id",
+			"value": "inv_1001"
+		}
+	]
+}

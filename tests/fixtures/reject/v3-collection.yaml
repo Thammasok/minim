@@ -1,0 +1,10 @@
+# Postman Collection Format v3 is YAML, not JSON. Newman (and therefore minim)
+# supports v2.1 JSON only — see CLAUDE.md.
+info:
+  name: Acme Billing (v3)
+  schema: https://schema.postman.com/collection/json/v3.0.0/draft-07/collection.json
+item:
+  - name: Login
+    request:
+      method: POST
+      url: https://api.acme.test/v1/auth/login

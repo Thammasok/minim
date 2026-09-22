@@ -1,0 +1,16 @@
+{
+	"info": {
+		"_postman_id": "e1e1e1e1-0000-4000-8000-000000000001",
+		"name": "Nothing In Here",
+		"description": "A perfectly valid v2.1 collection with zero items. Per FR-022 this MUST load and render an explicit empty state naming the collection — it is NOT a rejection.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://api.empty.test",
+			"type": "string"
+		}
+	]
+}

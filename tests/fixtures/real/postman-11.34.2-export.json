@@ -1,0 +1,256 @@
+{
+	"info": {
+		"_postman_id": "c7e0b3f1-5a44-4f2b-b0d6-8e91a2c4d733",
+		"name": "Acme Catalog (v11 style)",
+		"description": {
+			"content": "Catalog + search API. Exported from Postman **11.34.2** — `_exporter_id`, `_collection_link`, a structured `version`, and a collection-level `protocolProfileBehavior` all appear at this vintage.",
+			"type": "text/markdown"
+		},
+		"version": {
+			"major": 2,
+			"minor": 3,
+			"patch": 1,
+			"identifier": "beta"
+		},
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40881234",
+		"_collection_link": "https://acme-team.postman.co/workspace/Acme~11111111-2222-3333-4444-555555555555/collection/40881234-c7e0b3f1-5a44-4f2b-b0d6-8e91a2c4d733"
+	},
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "key",
+				"value": "X-Api-Key",
+				"type": "string"
+			},
+			{
+				"key": "value",
+				"value": "{{api_key}}",
+				"type": "string"
+			},
+			{
+				"key": "in",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"protocolProfileBehavior": {
+		"disableBodyPruning": true,
+		"followRedirects": true
+	},
+	"item": [
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Search products",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "th-TH",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://api.acme.test/v3/products?q=shoe&limit=20&cursor=",
+							"protocol": "https",
+							"host": [
+								"api",
+								"acme",
+								"test"
+							],
+							"path": [
+								"v3",
+								"products"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "shoe",
+									"description": {
+										"content": "Free-text query.",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "cursor",
+									"value": null
+								},
+								{
+									"key": "include_archived",
+									"value": "false",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload product image",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "product_id",
+									"value": "prd_3310",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/Users/qa/fixtures/shoe.png",
+									"contentType": "image/png"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://api.acme.test/v3/products/:product_id/image",
+							"protocol": "https",
+							"host": [
+								"api",
+								"acme",
+								"test"
+							],
+							"path": [
+								"v3",
+								"products",
+								":product_id",
+								"image"
+							],
+							"variable": [
+								{
+									"key": "product_id",
+									"value": "prd_3310"
+								}
+							]
+						}
+					},
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"// folder-level pre-request",
+							"pm.collectionVariables.set('started_at', Date.now().toString());"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "GraphQL",
+			"item": [
+				{
+					"name": "Catalog query",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Catalog($first: Int!) {\n  products(first: $first) {\n    id\n    name\n    price\n  }\n}",
+								"variables": "{\n  \"first\": 10\n}"
+							}
+						},
+						"url": {
+							"raw": "https://api.acme.test/graphql",
+							"protocol": "https",
+							"host": [
+								"api",
+								"acme",
+								"test"
+							],
+							"path": [
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.acme.test/healthz",
+					"protocol": "https",
+					"host": [
+						"api",
+						"acme",
+						"test"
+					],
+					"path": [
+						"healthz"
+					]
+				},
+				"auth": {
+					"type": "noauth"
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"pm.test('no server error', function () {",
+					"    pm.expect(pm.response.code).to.be.below(500);",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "api_key",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "started_at",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

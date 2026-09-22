@@ -1,0 +1,69 @@
+[package]
+name = "minim"
+version = "0.1.0"
+description = "minim — a Postman Collection v2.1 viewer"
+authors = ["minim contributors"]
+license = "MIT"
+repository = "https://github.com/Thammasok/minim"
+edition = "2021"
+rust-version = "1.82"
+default-run = "minim"
+
+# The desktop binary is a thin shell over the library so the same entry point can be
+# reused by the mobile entry point and, more importantly here, by integration tests.
+[lib]
+name = "minim_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+# criterion_main! provides the harness for the T-012 performance benches; the libtest
+# harness would otherwise hijack the bench binary and report "0 tests" without running them.
+[[bench]]
+name = "collection"
+harness = false
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+# The only two plugins the webview is ever granted (design.md §Dependencies):
+# dialog hands back a path and nothing more; store keeps recents/prefs in the app config dir.
+tauri-plugin-dialog = "2"
+tauri-plugin-store = "2"
+serde = { version = "1", features = ["derive"] }
+# unbounded_depth: the torture.json fixture nests item groups far deeper than serde's default
+# 128-recursion limit; the node index must survive it (TC-U-031, T-007).
+serde_json = { version = "1", features = ["unbounded_depth"] }
+thiserror = "2"
+specta = { version = "=2.0.0-rc.25", features = ["derive"] }
+# NFR-015 — TypeScript bindings generated from the command signatures (T-008). Pin the
+# whole beta line with `=` so a future -rc never breaks the build (per the crate docs).
+# `derive` exposes the `Event` macro later if minim grows events; `typescript` enables the
+# Typescript exporter behind `specta_typescript`.
+tauri-specta = { version = "=2.0.0-rc.25", features = ["derive", "typescript"] }
+specta-typescript = "=0.0.12"
+
+[dev-dependencies]
+# NFR-001 / NFR-002 / NFR-004 — the three performance budgets with assertions in
+# benches/collection.rs (T-012). Getrusage-style peak RSS needs libc on both Linux and macOS.
+criterion = "0.7.0"
+libc = "0.2.189"
+# TC-U-003 / TC-U-004 are config assertions: they read the JSON security surface off disk.
+serde_json = "1"
+serde_stacker = "0.1.14"
+
+# Criterion needs catch_unwind and in-process timing, and cargo always compiles profiles
+# used by benchmarks with unwind anyway — so backing out of release's size-first LTO keeps
+# every `cargo bench` build fast without affecting the shipped binary.
+[profile.bench]
+lto = false
+codegen-units = 16
+opt-level = 3
+
+[profile.release]
+# NFR-013 caps the installed app at 50 MB — strip symbols and let LLVM see the whole crate graph.
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

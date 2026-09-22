@@ -1,0 +1,10 @@
+{
+  "item": [
+    {
+      "name": "Ping",
+      "request": { "method": "GET", "header": [], "url": "https://api.test/ping" },
+      "response": []
+    }
+  ],
+  "variable": []
+}

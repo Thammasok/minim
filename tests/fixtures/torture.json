@@ -1,0 +1,989 @@
+{
+  "info": {
+    "_postman_id": "00000000-dead-4bee-8000-0000000t0rtur",
+    "name": "Polymorphism Torture",
+    "description": {
+      "content": "# Torture fixture\n\nHand-authored. Exercises **every** polymorphic shape in FR-010..FR-013, all five body modes, all eleven auth types, folders nested six deep, unknown fields at every level, and unnamed nodes.\n\nThis file is not a Postman export and never was — see `tests/fixtures/README.md`.",
+      "type": "text/markdown"
+    },
+    "version": {
+      "major": 1,
+      "minor": 0,
+      "patch": 0,
+      "identifier": "torture"
+    },
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "00000000",
+    "x_minim_unknown_info": "FR-009: unknown field on info"
+  },
+  "x_minim_unknown_root": {
+    "note": "FR-009: unknown field at the collection root",
+    "nested": [1, 2, 3]
+  },
+  "protocolProfileBehavior": {
+    "disableBodyPruning": true,
+    "x_minim_unknown_ppb": true
+  },
+  "auth": {
+    "type": "basic",
+    "basic": [
+      { "key": "username", "value": "{{basic_user}}", "type": "string" },
+      { "key": "password", "value": "{{basic_pass}}", "type": "string" }
+    ],
+    "x_minim_unknown_auth": "FR-009: unknown field on collection auth"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "id": "collection-prerequest",
+        "type": "text/javascript",
+        "exec": [
+          "// FR-012: exec as an ARRAY of lines, at collection level",
+          "pm.collectionVariables.set('run_id', '1');"
+        ],
+        "x_minim_unknown_script": "FR-009: unknown field on script"
+      },
+      "x_minim_unknown_event": "FR-009: unknown field on event"
+    },
+    {
+      "listen": "test",
+      "script": {
+        "id": "collection-test",
+        "type": "text/javascript",
+        "exec": "// FR-012: exec as a single STRING, at collection level\npm.test('collection-level test', function () { pm.expect(true).to.be.true; });"
+      }
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "https://api.torture.test", "type": "string" },
+    { "key": "basic_user", "value": "alice" },
+    {
+      "key": "basic_pass",
+      "value": "s3cr3t",
+      "type": "string",
+      "description": "FR-013: description as a STRING on a variable",
+      "x_minim_unknown_variable": "FR-009: unknown field on variable"
+    },
+    {
+      "key": "documented",
+      "value": "1",
+      "description": {
+        "content": "FR-013: description as an OBJECT on a variable",
+        "type": "text/markdown"
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "01 URL shapes (FR-010)",
+      "description": "FR-013: folder description as a STRING",
+      "x_minim_unknown_folder": "FR-009: unknown field on an ItemGroup",
+      "item": [
+        {
+          "name": "url as a bare STRING",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "https://api.torture.test:8443/v1/things?page=1#frag"
+          },
+          "response": []
+        },
+        {
+          "name": "url as an OBJECT WITH raw",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://api.torture.test/v1/things/42?expand=owner",
+              "protocol": "https",
+              "host": ["api", "torture", "test"],
+              "path": ["v1", "things", "42"],
+              "query": [{ "key": "expand", "value": "owner" }],
+              "x_minim_unknown_url": "FR-009: unknown field on url"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "url as an OBJECT WITHOUT raw - host array, port, path segments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "protocol": "https",
+              "host": ["api", "torture", "test"],
+              "port": "8443",
+              "path": ["v1", "things", "42", "children"],
+              "hash": "anchor",
+              "query": [
+                { "key": "sort", "value": "desc" },
+                { "key": "empty", "value": null },
+                { "key": "off", "value": "1", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "url as an OBJECT WITHOUT raw - host string, path string",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "protocol": "http",
+              "host": "localhost",
+              "port": "3000",
+              "path": "v1/plain/path"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "url as an OBJECT WITHOUT raw - path variables as segment OBJECTS",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "protocol": "https",
+              "host": ["api", "torture", "test"],
+              "path": [
+                "v1",
+                { "type": "string", "value": "tenants" },
+                ":tenant_id",
+                { "value": "users" },
+                ":user_id"
+              ],
+              "variable": [
+                { "key": "tenant_id", "value": "t_001" },
+                {
+                  "key": "user_id",
+                  "value": "u_002",
+                  "description": {
+                    "content": "FR-013: description as an OBJECT on a path variable",
+                    "type": "text/plain"
+                  }
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "url as an OBJECT with NOTHING but a host",
+          "request": {
+            "method": "HEAD",
+            "header": [],
+            "url": { "host": ["example", "test"] }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 Header shapes (FR-011)",
+      "description": {
+        "content": "FR-013: folder description as an OBJECT",
+        "type": "text/markdown"
+      },
+      "item": [
+        {
+          "name": "header as an ARRAY",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              {
+                "key": "X-Trace",
+                "value": "abc-123",
+                "description": "FR-013: description as a STRING on a header",
+                "x_minim_unknown_header": "FR-009: unknown field on a header"
+              },
+              {
+                "key": "X-Documented",
+                "value": "yes",
+                "description": {
+                  "content": "FR-013: description as an OBJECT on a header",
+                  "type": "text/plain"
+                }
+              },
+              { "key": "X-Disabled", "value": "nope", "disabled": true },
+              { "key": "X-Empty", "value": "" }
+            ],
+            "url": "{{base_url}}/v1/headers/array"
+          },
+          "response": []
+        },
+        {
+          "name": "header as a RAW BLOCK string",
+          "request": {
+            "method": "GET",
+            "header": "Accept: application/json\r\nAuthorization: Bearer abc.def.ghi\nX-Time: 12:34:56\nX-Empty-Value:\nX-No-Colon-At-All\n  X-Leading-Space  :   trimmed   ",
+            "url": "{{base_url}}/v1/headers/raw"
+          },
+          "response": []
+        },
+        {
+          "name": "header ARRAY that is empty",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/v1/headers/empty"
+          },
+          "response": []
+        },
+        {
+          "name": "header key omitted entirely",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/v1/headers/absent"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 Script shapes (FR-012)",
+      "item": [
+        {
+          "name": "exec as an ARRAY of lines",
+          "request": { "method": "GET", "header": [], "url": "{{base_url}}/v1/scripts/array" },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["const a = 1;", "const b = 2;", "console.log(a + b);"]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('array exec', function () {", "  pm.response.to.be.ok;", "});"]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "exec as a single STRING",
+          "request": { "method": "GET", "header": [], "url": "{{base_url}}/v1/scripts/string" },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": "const a = 1;\nconst b = 2;\nconsole.log(a + b);"
+              }
+            },
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": "pm.test('string exec', () => pm.response.to.be.ok);" }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "exec as an EMPTY array, and a script with no exec at all",
+          "request": { "method": "GET", "header": [], "url": "{{base_url}}/v1/scripts/empty" },
+          "event": [
+            { "listen": "prerequest", "script": { "type": "text/javascript", "exec": [] } },
+            { "listen": "test", "script": { "type": "text/javascript" } }
+          ],
+          "response": []
+        },
+        {
+          "name": "script loaded from src instead of exec (both url shapes)",
+          "request": { "method": "GET", "header": [], "url": "{{base_url}}/v1/scripts/src" },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": { "type": "text/javascript", "src": "https://cdn.torture.test/pre.js" }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "src": {
+                  "protocol": "https",
+                  "host": ["cdn", "torture", "test"],
+                  "path": ["post.js"]
+                }
+              }
+            },
+            {
+              "listen": "test",
+              "disabled": true,
+              "script": { "type": "text/javascript", "exec": "// disabled event" }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 Description shapes (FR-013)",
+      "item": [
+        {
+          "name": "description as a STRING everywhere it can appear",
+          "description": "FR-013: item description as a STRING",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-D", "value": "1", "description": "header description, string" }],
+            "url": {
+              "raw": "{{base_url}}/v1/desc/string?q=1",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "desc", "string"],
+              "query": [{ "key": "q", "value": "1", "description": "query description, string" }]
+            },
+            "description": "FR-013: request description as a STRING"
+          },
+          "response": []
+        },
+        {
+          "name": "description as an OBJECT everywhere it can appear",
+          "description": {
+            "content": "FR-013: item description as an OBJECT",
+            "type": "text/markdown",
+            "version": null
+          },
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-D",
+                "value": "1",
+                "description": { "content": "header description, object", "type": "text/plain" }
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "field",
+                  "value": "v",
+                  "description": { "content": "urlencoded description, object", "type": "text/plain" }
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/desc/object?q=1",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "desc", "object"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "1",
+                  "description": { "content": "query description, object", "type": "text/html" }
+                }
+              ]
+            },
+            "description": {
+              "content": "FR-013: request description as an OBJECT",
+              "type": "text/markdown"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "description as NULL, and a description OBJECT with no content",
+          "description": null,
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-D", "value": "1", "description": null }],
+            "url": "{{base_url}}/v1/desc/null",
+            "description": { "type": "text/markdown" }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05 Body modes",
+      "item": [
+        {
+          "name": "body mode raw (json)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"unicode\": \"สวัสดี — éàü 🚀\",\n  \"escaped\": \"line1\\nline2\\t\\\"quoted\\\"\",\n  \"n\": 1\n}",
+              "options": { "raw": { "language": "json" }, "x_minim_unknown_options": true },
+              "x_minim_unknown_body": "FR-009: unknown field on body"
+            },
+            "url": "{{base_url}}/v1/body/raw-json"
+          },
+          "response": []
+        },
+        {
+          "name": "body mode raw (xml, and a raw body with no options)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/xml" }],
+            "body": {
+              "mode": "raw",
+              "raw": "<?xml version=\"1.0\"?>\n<order id=\"1\"><item sku=\"A\"/></order>",
+              "options": { "raw": { "language": "xml" } }
+            },
+            "url": "{{base_url}}/v1/body/raw-xml"
+          },
+          "response": []
+        },
+        {
+          "name": "body mode urlencoded",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "password" },
+                { "key": "username", "value": "{{basic_user}}" },
+                { "key": "password", "value": "{{basic_pass}}" },
+                { "key": "scope", "value": "read write", "disabled": true },
+                { "key": "novalue" }
+              ]
+            },
+            "url": "{{base_url}}/v1/body/urlencoded"
+          },
+          "response": []
+        },
+        {
+          "name": "body mode formdata (text + file + multi-src + disabled)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "a text field", "type": "text", "contentType": "text/plain" },
+                { "key": "single", "type": "file", "src": "/tmp/one.png", "contentType": "image/png" },
+                { "key": "many", "type": "file", "src": ["/tmp/a.png", "/tmp/b.png"] },
+                { "key": "unset", "type": "file", "src": null },
+                { "key": "skipped", "value": "no", "type": "text", "disabled": true },
+                {
+                  "key": "documented",
+                  "value": "x",
+                  "type": "text",
+                  "description": { "content": "formdata description, object", "type": "text/plain" }
+                }
+              ]
+            },
+            "url": "{{base_url}}/v1/body/formdata"
+          },
+          "response": []
+        },
+        {
+          "name": "body mode file",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/octet-stream" }],
+            "body": { "mode": "file", "file": { "src": "/tmp/payload.bin" } },
+            "url": "{{base_url}}/v1/body/file"
+          },
+          "response": []
+        },
+        {
+          "name": "body mode file with a null src",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": { "mode": "file", "file": { "src": null } },
+            "url": "{{base_url}}/v1/body/file-null"
+          },
+          "response": []
+        },
+        {
+          "name": "body mode graphql",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query Torture($id: ID!) {\n  thing(id: $id) {\n    id\n    name\n    children { id }\n  }\n}",
+                "variables": "{\n  \"id\": \"42\"\n}"
+              }
+            },
+            "url": "{{base_url}}/graphql"
+          },
+          "response": []
+        },
+        {
+          "name": "body present but disabled, and a request with body null",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "raw", "raw": "ignored", "disabled": true },
+            "url": "{{base_url}}/v1/body/disabled"
+          },
+          "response": []
+        },
+        {
+          "name": "no body key at all",
+          "request": { "method": "GET", "header": [], "url": "{{base_url}}/v1/body/absent" },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "06 Auth types",
+      "description": "One leaf per auth type in the published v2.1 enum, plus folder-level and inherited auth.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [{ "key": "token", "value": "{{folder_token}}", "type": "string" }]
+      },
+      "item": [
+        {
+          "name": "auth apikey",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/v1/auth/apikey",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                { "key": "key", "value": "X-Api-Key", "type": "string" },
+                { "key": "value", "value": "{{api_key}}", "type": "string" },
+                { "key": "in", "value": "header", "type": "string" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "auth awsv4",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/v1/auth/awsv4",
+            "auth": {
+              "type": "awsv4",
+              "awsv4": [
+                { "key": "accessKey", "value": "AKIAIOSFODNN7EXAMPLE", "type": "string" },
+                { "key": "secretKey", "value": "{{aws_secret}}", "type": "string" },
+                { "key": "sessionToken", "value": "", "type": "string" },
+                { "key": "region", "value": "ap-southeast-1", "type": "string" },
+                { "key": "service", "value": "execute-api", "type": "string" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "auth basic",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/v1/auth/basic",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "alice", "type": "string" },
+                { "key": "password", "value": "s3cr3t", "type": "string" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "auth bearer",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/v1/auth/bearer",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "auth digest",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/v1/auth/digest",
+            "auth": {
+              "type": "digest",
+              "digest": [
+                { "key": "username", "value": "alice", "type": "string" },
+                { "key": "password", "value": "s3cr3t", "type": "string" },
+                { "key": "algorithm", "value": "MD5", "type": "string" },
+                { "key": "realm", "value": "torture", "type": "string" },
+                { "key": "nonce", "value": "n0nc3", "type": "string" },
+                { "key": "qop", "value": "auth", "type": "string" },
+                { "key": "nonceCount", "value": "00000001", "type": "string" },
+                { "key": "clientNonce", "value": "cn0nc3", "type": "string" },
+                { "key": "opaque", "value": "", "type": "string" },
+                { "key": "disableRetryRequest", "value": true, "type": "boolean" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "auth edgegrid",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/v1/auth/edgegrid",
+            "auth": {
+              "type": "edgegrid",
+              "edgegrid": [
+                { "key": "accessToken", "value": "{{eg_access}}", "type": "string" },
+                { "key": "clientToken", "value": "{{eg_client}}", "type": "string" },
+                { "key": "clientSecret", "value": "{{eg_secret}}", "type": "string" },
+                { "key": "baseURL", "value": "https://akab-xxxx.luna.akamaiapis.net", "type": "string" },
+                { "key": "headersToSign", "value": "", "type": "string" },
+                { "key": "nonce", "value": "", "type": "string" },
+                { "key": "timestamp", "value": "", "type": "string" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "auth hawk",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/v1/auth/hawk",
+            "auth": {
+              "type": "hawk",
+              "hawk": [
+                { "key": "authId", "value": "dh37fgj492je", "type": "string" },
+                { "key": "authKey", "value": "{{hawk_key}}", "type": "string" },
+                { "key": "algorithm", "value": "sha256", "type": "string" },
+                { "key": "user", "value": "", "type": "string" },
+                { "key": "nonce", "value": "", "type": "string" },
+                { "key": "extraData", "value": "", "type": "string" },
+                { "key": "appId", "value": "", "type": "string" },
+                { "key": "delegation", "value": "", "type": "string" },
+                { "key": "timestamp", "value": "", "type": "string" },
+                { "key": "includePayloadHash", "value": false, "type": "boolean" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "auth ntlm",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/v1/auth/ntlm",
+            "auth": {
+              "type": "ntlm",
+              "ntlm": [
+                { "key": "username", "value": "DOMAIN\\alice", "type": "string" },
+                { "key": "password", "value": "s3cr3t", "type": "string" },
+                { "key": "domain", "value": "DOMAIN", "type": "string" },
+                { "key": "workstation", "value": "WS01", "type": "string" },
+                { "key": "disableRetryRequest", "value": true, "type": "boolean" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "auth oauth1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/v1/auth/oauth1",
+            "auth": {
+              "type": "oauth1",
+              "oauth1": [
+                { "key": "consumerKey", "value": "ck", "type": "string" },
+                { "key": "consumerSecret", "value": "{{cs}}", "type": "string" },
+                { "key": "token", "value": "tk", "type": "string" },
+                { "key": "tokenSecret", "value": "{{ts}}", "type": "string" },
+                { "key": "signatureMethod", "value": "HMAC-SHA1", "type": "string" },
+                { "key": "version", "value": "1.0", "type": "string" },
+                { "key": "addParamsToHeader", "value": true, "type": "boolean" },
+                { "key": "addEmptyParamsToSign", "value": false, "type": "boolean" },
+                { "key": "timestamp", "value": "", "type": "string" },
+                { "key": "nonce", "value": "", "type": "string" },
+                { "key": "realm", "value": "", "type": "string" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "auth oauth2 (nested object and array attribute values)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/v1/auth/oauth2",
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                { "key": "accessToken", "value": "{{oauth2_token}}", "type": "string" },
+                { "key": "tokenType", "value": "Bearer", "type": "string" },
+                { "key": "addTokenTo", "value": "header", "type": "string" },
+                { "key": "grant_type", "value": "authorization_code_with_pkce", "type": "string" },
+                { "key": "challengeAlgorithm", "value": "S256", "type": "string" },
+                { "key": "authRequestParams", "value": [{ "key": "prompt", "value": "consent", "enabled": true, "send_as": "request_url" }], "type": "any" },
+                { "key": "refreshRequestParams", "value": [], "type": "any" },
+                { "key": "client_authentication", "value": "body", "type": "string" },
+                { "key": "extra", "value": { "nested": { "deep": true } }, "type": "any" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "auth noauth (explicit opt-out of the folder bearer)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/v1/auth/noauth",
+            "auth": { "type": "noauth" }
+          },
+          "response": []
+        },
+        {
+          "name": "auth noauth with a null payload",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/v1/auth/noauth-null",
+            "auth": { "type": "noauth", "noauth": null }
+          },
+          "response": []
+        },
+        {
+          "name": "auth explicitly null - falls back to the folder bearer",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/v1/auth/null",
+            "auth": null
+          },
+          "response": []
+        },
+        {
+          "name": "auth absent - inherits the folder bearer",
+          "request": { "method": "GET", "header": [], "url": "{{base_url}}/v1/auth/inherited" },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "07 Deep nesting",
+      "item": [
+        {
+          "name": "depth 2",
+          "item": [
+            {
+              "name": "depth 3",
+              "item": [
+                {
+                  "name": "depth 4",
+                  "item": [
+                    {
+                      "name": "depth 5",
+                      "item": [
+                        {
+                          "name": "depth 6",
+                          "item": [
+                            {
+                              "name": "leaf at depth 7",
+                              "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": "{{base_url}}/v1/deep/7"
+                              },
+                              "response": []
+                            },
+                            {
+                              "name": "empty folder at depth 7",
+                              "item": []
+                            }
+                          ]
+                        },
+                        {
+                          "name": "leaf at depth 6",
+                          "request": { "method": "GET", "header": [], "url": "{{base_url}}/v1/deep/6" },
+                          "response": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "08 Unnamed nodes",
+      "item": [
+        {
+          "item": [
+            {
+              "request": { "method": "GET", "header": [], "url": "{{base_url}}/v1/unnamed/leaf" },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "",
+          "request": { "method": "GET", "header": [], "url": "{{base_url}}/v1/empty-name/leaf" },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "09 Saved examples (responses)",
+      "item": [
+        {
+          "name": "request with two saved examples",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/examples"
+          },
+          "response": [
+            {
+              "id": "ex-200",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": "Accept: application/json",
+                "url": "{{base_url}}/v1/examples"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "cookie": [
+                {
+                  "domain": "api.torture.test",
+                  "path": "/",
+                  "name": "sid",
+                  "value": "abc",
+                  "expires": "2099-01-01T00:00:00.000Z",
+                  "httpOnly": true,
+                  "secure": true
+                }
+              ],
+              "body": "{\n  \"ok\": true\n}",
+              "responseTime": 128,
+              "x_minim_unknown_response": "FR-009: unknown field on a saved response"
+            },
+            {
+              "id": "ex-500",
+              "name": "500 with a RAW header block and a string responseTime",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "protocol": "https",
+                  "host": ["api", "torture", "test"],
+                  "path": ["v1", "examples"]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "text",
+              "header": "Content-Type: text/plain\nX-Error: boom",
+              "body": null,
+              "responseTime": "128",
+              "timings": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "10 Unknown fields at every level",
+      "x_minim_unknown_folder_10": "FR-009",
+      "item": [
+        {
+          "name": "leaf carrying unknown fields on item, request, url, header, body, auth, event",
+          "x_minim_unknown_item": "FR-009: unknown field on an ItemRequest",
+          "protocolProfileBehavior": { "strictSSL": false, "x_minim_unknown": 1 },
+          "variable": [{ "key": "local", "value": "1", "x_minim_unknown_variable": true }],
+          "request": {
+            "method": "PATCH",
+            "x_minim_unknown_request": "FR-009: unknown field on a request",
+            "header": [{ "key": "X-U", "value": "1", "x_minim_unknown_header": true }],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "x_minim_unknown_body": true
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "t", "type": "string", "x_minim_unknown_attr": true }],
+              "x_minim_unknown_auth": true
+            },
+            "proxy": { "match": "http+https://*/*", "host": "proxy.torture.test", "port": 8080, "tunnel": false, "disabled": true },
+            "certificate": {
+              "name": "client cert",
+              "matches": ["https://api.torture.test/*"],
+              "key": { "src": "/tmp/client.key" },
+              "cert": { "src": "/tmp/client.crt" },
+              "passphrase": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/unknown",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "unknown"],
+              "x_minim_unknown_url": true
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "x_minim_unknown_event": true,
+              "script": { "type": "text/javascript", "exec": "// u", "x_minim_unknown_script": true }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "11 Exotic but legal methods",
+      "item": [
+        {
+          "name": "PROPFIND",
+          "request": { "method": "PROPFIND", "header": [], "url": "{{base_url}}/v1/dav" },
+          "response": []
+        },
+        {
+          "name": "PURGE",
+          "request": { "method": "PURGE", "header": [], "url": "{{base_url}}/v1/cache" },
+          "response": []
+        },
+        {
+          "name": "lowercase get",
+          "request": { "method": "get", "header": [], "url": "{{base_url}}/v1/lowercase" },
+          "response": []
+        },
+        {
+          "name": "method omitted (schema default is GET)",
+          "request": { "header": [], "url": "{{base_url}}/v1/nomethod" },
+          "response": []
+        },
+        {
+          "name": "request as a bare URL STRING",
+          "request": "{{base_url}}/v1/request-as-string",
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "12 Empty folder at the root",
+      "item": []
+    }
+  ]
+}

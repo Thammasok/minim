@@ -13,12 +13,49 @@ Two consequences shape every decision in this repo:
 
 ## Repository state
 
-`minim` (`git@github.com:Thammasok/minim.git`) is greenfield: the `main` branch has **no commits yet**, and there is no `package.json`, `tsconfig.json`, test runner, or linter. There are therefore no build/lint/test commands to run — if a task needs them, scaffold the toolchain first and record the resulting commands here. The UI stack and how Newman is invoked (child process, programmatic `newman.run`, …) are not decided yet in code; don't assume one.
+`minim` (`git@github.com:Thammasok/minim.git`) is still early — the `main` branch has **no commits yet** — but the toolchain now exists: the frontend at the repo root (Vite + React + TypeScript (strict) + Tailwind CSS v4 + shadcn/ui, with ESLint, Prettier and Vitest) and the Tauri v2 Rust shell in `src-tauri/`. How Newman is invoked (child process, programmatic `newman.run`, …) is still not decided in code; don't assume one.
 
-Only two things exist:
+### Commands
 
-- `postman-collection.ts` — the sole source file, and currently the whole domain model (see below).
+| Command | What it does |
+|---|---|
+| `npm run dev` | Vite dev server on port 1420 (`strictPort`, so the Tauri shell can attach) |
+| `npm run build` | `tsc -b` then `vite build` → `dist/` |
+| `npm run preview` | Serve the built `dist/` |
+| `npm run typecheck` | `tsc -b --noEmit` across both project references |
+| `npm run lint` / `npm run lint:fix` | ESLint (flat config, `eslint.config.js`) |
+| `npm run format` / `npm run format:check` | Prettier |
+| `npm run test` / `npm run test:watch` | Vitest — jsdom + React Testing Library |
+| `npm run tauri:dev` / `cargo tauri dev` | Tauri dev build — starts Vite, then attaches the desktop window |
+| `npm run tauri:build` / `cargo tauri build` | Release bundle for the host platform |
+| `cargo fmt --check` / `cargo clippy --all-targets -- -D warnings` / `cargo test` | Rust checks — run from `src-tauri/` |
+
+`cargo tauri …` needs `cargo install tauri-cli --version "^2"`; `npm run tauri …` uses the
+`@tauri-apps/cli` devDependency instead and needs no global install. `.github/workflows/ci.yml`
+runs the frontend checks once and the Rust checks on Linux, macOS and Windows.
+
+### Frontend conventions
+
+- **Tailwind v4 is CSS-first.** All configuration lives in `@theme` inside `src/index.css`. There is no `tailwind.config.js` and no PostCSS chain — do not add either; v3's JS config does not compose with v4.
+- **The `@/` alias maps to `src/`** and is declared in *both* `vite.config.ts` (`resolve.alias`) and `tsconfig.json` + `tsconfig.app.json` (`paths`). Change one and you must change the other — the shadcn CLI resolves it from the tsconfig, Vite and Vitest from the vite config.
+- **`cn()` is re-exported from `@/lib/utils`.** The implementation is the `cn` package that shadcn/ui's generated components import directly, so the project has exactly one class-merge implementation rather than a vendored copy beside it.
+- Folder layout follows `docs/collection-viewer/v1.0/design.md` §Frontend Structure: feature folders under `src/features/`, shadcn primitives in `src/components/ui/`, shell chrome in `src/components/layout/`.
+
+Alongside the app:
+
+- `.claude/docs/postman-collection.ts` — the domain model written so far (see below). It is reference/spec material, not yet wired into `src/`, and is excluded from lint and formatting.
 - `.claude/` — the agent workspace: a delivery-pipeline skill set and a shared knowledge base.
+- `docs/` — per-feature requirements, design, UX and dev plans.
+- `src-tauri/` — the Tauri v2 desktop shell (see below). Excluded from ESLint and Prettier; Cargo's `rustfmt`/`clippy` own it instead.
+
+### The Tauri shell (`src-tauri/`)
+
+The shell is deliberately thin — window, two plugins, nothing else. Two of its files are security surface and are covered by tests in `src-tauri/tests/config_guards.rs`, so widening either fails `cargo test` rather than shipping:
+
+- **`capabilities/default.json`** grants exactly `core:default`, `dialog:allow-open`, `store:default`. Never add an `fs:`, `http:` or `shell:` permission — per ADR-008 the Rust core reads collection files itself, so the webview needs no filesystem capability at all. `tauri-build` also rejects unknown identifiers at compile time, so only `core:*`, `dialog:*` and `store:*` are even grantable.
+- **`tauri.conf.json` → `app.security.csp`** is `default-src 'self'` with no remote origin in any directive. `devCsp` widens `connect-src` to `http://localhost:1420` / `ws://localhost:1420` for Vite HMR only; Tauri uses it only under `is_dev()`, never in a release bundle.
+
+`src/lib.rs` keeps the builder in a separate `build()` so managed state, an `invoke_handler` and the debug-only `--open <path>` argument of ADR-017 can be added without touching the entry point. `src/main.rs` is a one-liner — modify `lib.rs`.
 
 ## `postman-collection.ts`
 

@@ -1,0 +1,15 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Acme Billing",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/invoices": {
+      "get": {
+        "summary": "List invoices",
+        "responses": { "200": { "description": "ok" } }
+      }
+    }
+  }
+}

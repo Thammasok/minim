@@ -1,0 +1,23 @@
+{
+	"info": {
+		"_postman_id": "e1e1e1e1-0000-4000-8000-000000000002",
+		"name": "Folders But No Requests",
+		"description": "Items exist, but every one of them is an empty folder — so the tree renders with zero request leaves. FR-022's sibling case.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Alpha",
+			"item": []
+		},
+		{
+			"name": "Beta",
+			"item": [
+				{
+					"name": "Beta / nested",
+					"item": []
+				}
+			]
+		}
+	]
+}
